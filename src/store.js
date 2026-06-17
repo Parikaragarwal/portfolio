@@ -14,12 +14,13 @@ export const useStore = create((set) => ({
   // Transition state management
   isTransitioning: false,
   transitionTarget: null,
-  transitionType: 'none', // 'void-enter', 'dom-tree', 'packet-explode'
+  transitionType: 'none', // 'boot-sequence', 'cpu-painter'
   
   startTransition: (targetPath, type) => set({ 
     isTransitioning: true, 
     transitionTarget: targetPath,
-    transitionType: type
+    transitionType: type,
+    paintedItems: 0 // reset painter
   }),
   
   endTransition: () => set({ 
@@ -27,6 +28,10 @@ export const useStore = create((set) => ({
     transitionTarget: null,
     transitionType: 'none'
   }),
+  
+  // Painter logic for Projects page
+  paintedItems: 0,
+  incrementPaintedItems: () => set((state) => ({ paintedItems: state.paintedItems + 1 })),
   
   // Global void state (has the user "entered" the site?)
   hasEnteredVoid: false,

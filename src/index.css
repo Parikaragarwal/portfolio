@@ -1,29 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* LIGHT THEME (Emerald / Wheat aesthetic) */
-  --bg-base: #FAFCFB; /* very light mint/wheat hybrid */
-  --bg-surface: #F0F7F4; /* soft emerald tint */
-  --bg-surface-hover: #E2F0EA;
-  --text-main: #1A2E26; /* deep forest green almost black */
-  --text-muted: #5B7A6D;
-  --accent-primary: #2EA879; /* vibrant emerald */
-  --accent-secondary: #E5B25D; /* warm wheat/gold contrast */
+  /* LIGHT THEME (Soothing Pastel Matcha) */
+  --bg-base: #E8F2EB; 
+  --bg-surface: #D8E6DE; 
+  --text-main: #1A3324; 
+  --text-muted: #537561;
+  --accent-primary: #2EA879; 
   --border-light: rgba(46, 168, 121, 0.15);
   
   --font-heading: 'Outfit', sans-serif;
-  --font-body: 'Lora', serif;
 }
 
 [data-theme="dark"] {
-  --bg-base: #0B110E;
-  --bg-surface: #121A16;
-  --bg-surface-hover: #1A2620;
-  --text-main: #E2F0EA;
+  /* DARK THEME (Muted Pine / Slate) */
+  --bg-base: #0F1A14;
+  --bg-surface: #15241C;
+  --text-main: #E8F2EB;
   --text-muted: #8FA89C;
-  --accent-primary: #34D399; /* bright neon emerald */
-  --accent-secondary: #FCD34D; /* bright wheat */
-  --border-light: rgba(52, 211, 153, 0.15);
+  --accent-primary: #8CD9B1; /* Soft non-stinging mint */
+  --border-light: rgba(140, 217, 177, 0.15);
 }
 
 * {
@@ -35,7 +31,7 @@
 body {
   background: var(--bg-base);
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -45,7 +41,6 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -61,18 +56,6 @@ a:hover {
   color: var(--accent-primary);
 }
 
-.glass-panel {
-  background: transparent;
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  padding: 2rem;
-  transition: border-color 0.3s ease;
-}
-
-.glass-panel:hover {
-  border-color: var(--accent-primary);
-}
-
 /* Three.js Canvas Container */
 #webgl-container {
   position: fixed;
@@ -80,7 +63,7 @@ a:hover {
   left: 0;
   width: 100vw;
   height: 100vh;
-  pointer-events: none; /* Let clicks pass through unless active */
+  pointer-events: none;
   z-index: 100;
 }
 

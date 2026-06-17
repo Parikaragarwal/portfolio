@@ -1,56 +1,64 @@
 import { motion } from 'framer-motion';
 import { PORTFOLIO_DATA } from '../data/portfolio';
+import { useStore } from '../store';
 
 export default function Projects() {
+  const { paintedItems, isTransitioning, animationsEnabled } = useStore();
+
   return (
-    <motion.div
-      initial={{ scale: 0.9, opacity: 0, filter: 'blur(10px)' }}
-      animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      style={{ padding: '5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}
-    >
-      <h1 style={{ fontSize: '4rem', letterSpacing: '-1.5px', marginBottom: '4rem', color: 'var(--text-main)' }}>
-        Systems Lab
+    <div style={{ padding: '5rem 2rem', maxWidth: '800px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '4rem', letterSpacing: '-1.5px', color: 'var(--text-main)', marginBottom: '4rem' }}>
+        Projects
       </h1>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-        {PORTFOLIO_DATA.projects.map((project, idx) => (
-          <div 
-            key={project.id}
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: '1.5rem',
-              borderTop: '1px solid var(--border-light)',
-              paddingTop: '2rem'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
-              <div>
-                <h2 style={{ fontSize: '2.5rem', color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>{project.title}</h2>
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                  {project.tech.map(t => (
-                    <span key={t} style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      [{t}]
-                    </span>
-                  ))}
-                </div>
-                <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '600px' }}>{project.description}</p>
-              </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+        {PORTFOLIO_DATA.projects.map((project, idx) => {
+          // If animations are off, show everything.
+          // Otherwise, only show items if the CPU painter has reached their index.
+          const isRevealed = !animationsEnabled || (!isTransitioning && paintedItems > idx);
 
-              <div style={{ flex: '1 1 300px', background: 'var(--bg-surface)', padding: '2rem', borderRadius: '4px' }}>
-                <h4 style={{ color: 'var(--accent-secondary)', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Architecture Trace</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.95rem' }}>
-                  <p><strong style={{ color: 'var(--text-main)' }}>Surface:</strong> <span style={{ color: 'var(--text-muted)' }}>{project.layers.surface}</span></p>
-                  <p><strong style={{ color: 'var(--text-main)' }}>Mechanism:</strong> <span style={{ color: 'var(--text-muted)' }}>{project.layers.mechanism}</span></p>
-                  <p><strong style={{ color: 'var(--text-main)' }}>Implementation:</strong> <span style={{ color: 'var(--text-muted)' }}>{project.layers.implementation}</span></p>
+          return (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+              animate={isRevealed ? { opacity: 1, height: 'auto' } : { opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              style={{
+                borderBottom: '1px solid var(--border-light)',
+                paddingBottom: '3rem'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <h2 style={{ fontSize: '2rem', color: 'var(--text-main)', marginBottom: '1rem' }}>{project.title}</h2>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  {project.links.github && (
+                    <a href={project.links.github} target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', border: '1px solid var(--border-light)', padding: '0.25rem 0.75rem', borderRadius: '4px' }}>
+                      GitHub
+                    </a>
+                  )}
+                  {project.links.website && (
+                    <a href={project.links.website} target="_blank" rel="noreferrer" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', border: '1px solid var(--border-light)', padding: '0.25rem 0.75rem', borderRadius: '4px' }}>
+                      Live Site
+                    </a>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
+              
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                {project.tech.map(t => (
+                  <span key={t} style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem', background: 'var(--bg-surface)', borderRadius: '4px', color: 'var(--text-muted)' }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+              
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                {project.description}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
-    </motion.div>
+    </div>
   );
 }

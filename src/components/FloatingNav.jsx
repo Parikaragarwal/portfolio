@@ -41,8 +41,8 @@ export default function FloatingNav() {
         backdropFilter: 'blur(10px)'
       }}
     >
-      <button onClick={() => handleNav('/', 'packet-explode')} style={btnStyle(location.pathname === '/')}>Mind</button>
-      <button onClick={() => handleNav('/projects', 'dom-tree')} style={btnStyle(location.pathname === '/projects')}>Machine</button>
+      <button onClick={() => handleNav('/', 'boot-sequence')} style={btnStyle(location.pathname === '/')}>Mind</button>
+      <button onClick={() => handleNav('/projects', 'cpu-painter')} style={btnStyle(location.pathname === '/projects')}>Machine</button>
       
       <div style={{ width: '1px', height: '20px', background: 'var(--border-light)', margin: '0 0.5rem' }} />
 
