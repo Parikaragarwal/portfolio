@@ -1,4 +1,4 @@
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { PORTFOLIO_DATA } from '../data/portfolio';
 import CpuTransition from '../components/CpuTransition';
@@ -16,27 +16,67 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
 };
 
+/*
+  CPU Snap-Lock Strategy
+  ──────────────────────
+  Instead of IntersectionObserver (which is non-deterministic with slow scrolling),
+  we attach a global scroll listener that watches for when the user's scroll position
+  crosses the TOP of the projects section.
+
+  The moment they cross that threshold (regardless of scroll speed):
+    1. Immediately snap-scroll to the section's top
+    2. Lock all scroll (wheel, touch, keyboard)
+    3. Mount <CpuTransition /> which plays the 4s animation
+    4. On completion, release all scroll locks
+
+  The trigger fires ONCE (cpuTriggered guard). Once cpuDone=true the normal
+  page content animates in.
+*/
 export default function ProjectsSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const sectionRef = useRef(null);
   const [cpuDone, setCpuDone] = useState(false);
   const [cpuTriggered, setCpuTriggered] = useState(false);
+  const [isInViewAfterCpu, setIsInViewAfterCpu] = useState(false);
 
-  // Memoize so CpuTransition doesn't re-render when parent state changes
-  const handleCpuComplete = useCallback(() => setCpuDone(true), []);
+  // Stable callback — won't cause CpuTransition re-renders
+  const handleCpuComplete = useCallback(() => {
+    setCpuDone(true);
+    // Small delay before revealing content so the CPU exit animation finishes
+    setTimeout(() => setIsInViewAfterCpu(true), 100);
+  }, []);
 
   useEffect(() => {
-    if (isInView && !cpuDone && !cpuTriggered && ref.current) {
-      setCpuTriggered(true);
-      // Snap viewport to the top of the projects section immediately
-      const rect = ref.current.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      window.scrollTo({ top: scrollTop + rect.top, behavior: 'smooth' });
-    }
-  }, [isInView, cpuDone, cpuTriggered]);
+    // Don't attach listener if already triggered or done
+    if (cpuTriggered || cpuDone) return;
+
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+
+      const sectionTop = sectionRef.current.getBoundingClientRect().top;
+
+      // Fire when the top of the projects section reaches the top half of the viewport
+      // (i.e. user has scrolled far enough that the section is becoming the main content)
+      if (sectionTop <= window.innerHeight * 0.55) {
+        setCpuTriggered(true);
+
+        // Remove listener immediately — one-shot
+        window.removeEventListener('scroll', handleScroll);
+
+        // Snap to the exact top of the section, synchronously
+        const absoluteTop = window.scrollY + sectionTop;
+        window.scrollTo({ top: absoluteTop, behavior: 'instant' });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Also check immediately in case the section is already in position on mount
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [cpuTriggered, cpuDone]);
 
   return (
-    <section id="projects" className="section" ref={ref}>
+    <section id="projects" className="section" ref={sectionRef}>
       {/* CPU Transition Animation */}
       {cpuTriggered && !cpuDone && (
         <CpuTransition onComplete={handleCpuComplete} />
@@ -46,7 +86,7 @@ export default function ProjectsSection() {
       <motion.div
         variants={stagger}
         initial="hidden"
-        animate={(isInView && cpuDone) ? 'show' : 'hidden'}
+        animate={isInViewAfterCpu ? 'show' : 'hidden'}
       >
         <motion.span className="register-label amber" variants={fadeUp}>
           0x02 :: MOUNT_POINT /projects

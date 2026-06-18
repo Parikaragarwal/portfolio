@@ -40,35 +40,46 @@ export default function CpuTransition({ onComplete }) {
     };
   }, []); // empty deps — animation runs exactly once on mount
 
-  // Lock scrolling while the CPU transition is playing — lock immediately, no delay
+  // Lock scrolling while the CPU transition is playing — lock exactly once on mount
   useEffect(() => {
-    if (stage === 'done') {
-      // Release all locks
-      document.body.style.overflow = '';
-      return;
-    }
-
-    // Lock body overflow immediately
+    // Save current scroll Y and pin body so viewport cannot move at all
+    const scrollY = window.scrollY;
+    // Set a flag on the body so we know we locked it
+    document.body.dataset.cpuLockScroll = String(scrollY);
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
     document.body.style.overflow = 'hidden';
 
-    // Block wheel, touch, and keyboard scroll events
-    const preventScroll = (e) => e.preventDefault();
+    // Also block wheel/touch/keyboard as belt-and-suspenders
+    const prevent = (e) => e.preventDefault();
     const preventKeys = (e) => {
-      const scrollKeys = ['ArrowDown', 'ArrowUp', 'Space', 'PageDown', 'PageUp', 'Home', 'End'];
-      if (scrollKeys.includes(e.code)) e.preventDefault();
+      if (['ArrowDown','ArrowUp','Space','PageDown','PageUp','Home','End'].includes(e.code))
+        e.preventDefault();
     };
-
-    window.addEventListener('wheel', preventScroll, { passive: false });
-    window.addEventListener('touchmove', preventScroll, { passive: false });
-    window.addEventListener('keydown', preventKeys, { passive: false });
+    window.addEventListener('wheel',     prevent,     { passive: false });
+    window.addEventListener('touchmove', prevent,     { passive: false });
+    window.addEventListener('keydown',   preventKeys, { passive: false });
 
     return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('wheel', preventScroll);
-      window.removeEventListener('touchmove', preventScroll);
-      window.removeEventListener('keydown', preventKeys);
+      window.removeEventListener('wheel',     prevent);
+      window.removeEventListener('touchmove', prevent);
+      window.removeEventListener('keydown',   preventKeys);
+      
+      // Release — restore body and scroll position
+      if (document.body.style.position === 'fixed') {
+        const savedY = parseInt(document.body.dataset.cpuLockScroll || '0', 10);
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        delete document.body.dataset.cpuLockScroll;
+        window.scrollTo({ top: savedY, behavior: 'instant' });
+      }
     };
-  }, [stage]);
+  }, []);
 
   if (stage === 'done') return null;
 
