@@ -10,7 +10,7 @@ const SECTIONS = [
 ];
 
 export default function FloatingNav() {
-  const { theme, toggleTheme, bootPhase, activeSection, setActiveSection } = useStore();
+  const { theme, toggleTheme, bootPhase, activeSection, setActiveSection, replayBoot } = useStore();
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -137,6 +137,36 @@ export default function FloatingNav() {
           margin: '0 0.25rem',
           flexShrink: 0,
         }} />
+
+        {/* Replay Boot Toggle */}
+        <button
+          onClick={replayBoot}
+          title="Replay Animations"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '0.4rem',
+            cursor: 'pointer',
+            color: 'var(--text-tertiary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            transition: 'color 0.2s ease, background 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--accent-cyan)';
+            e.currentTarget.style.background = 'var(--bg-elevated)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-tertiary)';
+            e.currentTarget.style.background = 'none';
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l1.08 1.69" />
+          </svg>
+        </button>
 
         {/* Theme toggle */}
         <button

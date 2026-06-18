@@ -38,6 +38,22 @@ export default function CpuTransition({ onComplete }) {
     };
   }, [onComplete]);
 
+  // Lock scrolling while the CPU transition is playing
+  useEffect(() => {
+    let lockTimer;
+    if (stage !== 'done') {
+      lockTimer = setTimeout(() => {
+        document.body.style.overflow = 'hidden';
+      }, 500);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      clearTimeout(lockTimer);
+      document.body.style.overflow = '';
+    };
+  }, [stage]);
+
   if (stage === 'done') return null;
 
   return (

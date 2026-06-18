@@ -18,8 +18,15 @@ const fadeUp = {
 
 export default function ProjectsSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, amount: 0.4 });
   const [cpuDone, setCpuDone] = useState(false);
+
+  useEffect(() => {
+    if (isInView && !cpuDone && ref.current) {
+      // Snap to the CPU segment predictably
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isInView, cpuDone]);
 
   return (
     <section id="projects" className="section" ref={ref}>

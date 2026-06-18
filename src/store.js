@@ -42,6 +42,11 @@ export const useStore = create((set, get) => ({
     set({ bootPhase: 'complete' });
   },
 
+  replayBoot: () => {
+    try { sessionStorage.removeItem('boot-complete'); } catch (e) { /* no-op */ }
+    set({ bootPhase: 'idle' });
+  },
+
   // --- Navigation ---
   activeSection: 'hero',
   setActiveSection: (section) => set({ activeSection: section }),

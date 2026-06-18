@@ -5,35 +5,35 @@
 
 /* ---- CSS Custom Properties (Design Tokens) ---- */
 :root {
-  /* Light Mode: Green-tinted engineering paper */
-  --bg-base: #f0f4ec;
-  --bg-surface: #e8ede3;
-  --bg-elevated: #dce3d5;
-  --bg-overlay: rgba(240, 244, 236, 0.92);
+  /* Light Mode: Soft Slate Blue */
+  --bg-base: #e2e8f0;
+  --bg-surface: #f1f5f9;
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(226, 232, 240, 0.92);
 
-  --text-primary: #1a2e1f;
-  --text-secondary: #3d5a45;
-  --text-tertiary: #6b8a73;
-  --text-dim: #9aac9f;
+  --text-primary: #020617; /* Slate 950 for maximum darkness */
+  --text-secondary: #0f172a; /* Slate 900 */
+  --text-tertiary: #1e293b; /* Slate 800 */
+  --text-dim: #334155; /* Slate 700 */
 
-  --accent-cyan: #0e7c6b;
-  --accent-cyan-glow: rgba(14, 124, 107, 0.4);
-  --accent-amber: #b87a1a;
-  --accent-amber-glow: rgba(184, 122, 26, 0.4);
-  --accent-green: #2d8a4e;
-  --accent-green-glow: rgba(45, 138, 78, 0.4);
-  --accent-red: #c0392b;
+  --accent-cyan: #0284c7;
+  --accent-cyan-glow: rgba(2, 132, 199, 0.4);
+  --accent-amber: #ea580c;
+  --accent-amber-glow: rgba(234, 88, 12, 0.4);
+  --accent-green: #059669;
+  --accent-green-glow: rgba(5, 150, 105, 0.4);
+  --accent-red: #dc2626;
 
-  --border-strong: #a3b5a7;
-  --border-medium: #c5d4c8;
-  --border-faint: rgba(26, 46, 31, 0.08);
+  --border-strong: #94a3b8;
+  --border-medium: #cbd5e1;
+  --border-faint: rgba(15, 23, 42, 0.08);
 
-  --trace-color: #a3b5a7;
-  --trace-glow: rgba(14, 124, 107, 0.2);
-  --node-color: #0e7c6b;
+  --trace-color: #059669;
+  --trace-glow: rgba(5, 150, 105, 0.3);
+  --node-color: #059669;
 
-  --grid-color: rgba(26, 46, 31, 0.06);
-  --grid-dot: rgba(26, 46, 31, 0.12);
+  --grid-color: rgba(15, 23, 42, 0.06);
+  --grid-dot: rgba(15, 23, 42, 0.12);
 
   --shadow-sm: 0 1px 3px rgba(26, 46, 31, 0.08);
   --shadow-md: 0 4px 12px rgba(26, 46, 31, 0.1);
@@ -156,6 +156,7 @@ a:hover {
 p {
   color: var(--text-secondary);
   max-width: 65ch;
+  font-weight: 500;
 }
 
 /* ---- Component: Chip Block (IC Package Container) ---- */
@@ -168,9 +169,13 @@ p {
   transition: border-color var(--timing-standard) ease, box-shadow var(--timing-standard) ease;
 }
 
+[data-theme="dark"] .chip-block {
+  background: var(--bg-surface);
+}
+
 .chip-block:hover {
-  border-color: var(--accent-cyan);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 20px var(--accent-green-glow);
 }
 
 /* Pin connectors on chip blocks */
@@ -184,7 +189,7 @@ p {
 
 .chip-block:hover::before,
 .chip-block:hover::after {
-  background: var(--accent-cyan);
+  background: var(--accent-green);
 }
 
 /* Left pins */
@@ -200,8 +205,8 @@ p {
 
 .chip-block:hover::before {
   box-shadow:
-    0 12px 0 var(--accent-cyan),
-    0 24px 0 var(--accent-cyan);
+    0 12px 0 var(--accent-green),
+    0 24px 0 var(--accent-green);
 }
 
 /* Right pins */
@@ -217,17 +222,17 @@ p {
 
 .chip-block:hover::after {
   box-shadow:
-    0 12px 0 var(--accent-cyan),
-    0 24px 0 var(--accent-cyan);
+    0 12px 0 var(--accent-green),
+    0 24px 0 var(--accent-green);
 }
 
 /* ---- Component: Register Label ---- */
 .register-label {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
   margin-bottom: 0.75rem;
@@ -242,19 +247,25 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.7rem;
+  padding: 0.35rem 0.8rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--accent-cyan);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-medium);
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--node-color);
+  border: none;
   border-radius: var(--radius-sm);
   transition: all var(--timing-fast) ease;
 }
 
+[data-theme="dark"] .data-tag {
+  color: var(--bg-base);
+}
+
 .data-tag:hover {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 8px var(--accent-cyan-glow);
+  background: var(--accent-cyan);
+  box-shadow: 0 0 12px var(--accent-green-glow);
+  transform: translateY(-1px);
 }
 
 /* ---- Component: Port Link ---- */
@@ -275,9 +286,9 @@ p {
 }
 
 .port-link:hover {
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-  text-shadow: 0 0 8px var(--accent-cyan-glow);
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  text-shadow: 0 0 8px var(--accent-green-glow);
   background: var(--bg-elevated);
 }
 

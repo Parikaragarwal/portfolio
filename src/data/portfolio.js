@@ -1,66 +1,85 @@
 export const PORTFOLIO_DATA = {
   about: {
     name: "Parikar",
-    tagline: "Software Engineer & Architect",
-    bio: "I build systems and dismantle them to see how they work. I care about the lowest layers of abstraction and how data physically moves across the network."
+    tagline: "Full Stack Developer & Systems Explorer",
+    bio: "I enjoy building web applications and then digging beneath the abstractions that make them work. From OAuth flows and type-safe APIs to Linux, networking, deployment, and system architecture, I'm fascinated by how software moves through the stack."
   },
+
   socials: [
     { name: "GitHub", url: "https://github.com/parikar" },
-    { name: "Twitter", url: "https://twitter.com/parikar" },
     { name: "LinkedIn", url: "https://linkedin.com/in/parikar" }
   ],
+
   questions: [
-    "How does distributed consensus hold up under extreme Byzantine faults?",
-    "Why did we abstract away the DOM instead of optimizing it directly?",
-    "Can we build a fully functional OS kernel entirely in Rust for production?"
+    "Where does complexity actually come from in software systems?",
+    "How far can type safety be pushed across the frontend-backend boundary?",
+    "What abstractions are worth keeping, and which ones hide too much?",
+    "How does a request really travel from a browser to a database and back?"
   ],
+
   obsessions: [
-    "Database Internals", "Compilers", "TCP/IP Stack", "Event Loops", "WebAssembly"
+    "OAuth & Identity",
+    "Type-Safe APIs",
+    "Linux",
+    "Networking",
+    "System Architecture",
+    "Developer Tooling",
+    "Self Hosting"
   ],
+
   admiredSystems: [
-    "Git - For its immutable DAG data structure that perfectly solves distributed state.",
-    "PostgreSQL - The absolute gold standard of extensible, rock-solid engineering.",
-    "Redis - Proving that single-threaded architecture can still dominate if done right."
+    "Git — A distributed system most developers use every day without fully appreciating its design.",
+    "PostgreSQL — A database that keeps revealing deeper layers the more you study it.",
+    "Linux — The foundation beneath most modern software infrastructure.",
+    "TypeScript — A practical example of how tooling can dramatically improve developer experience."
   ],
+
   projects: [
     {
       id: "transparent-machine",
       title: "Transparent Machine",
-      description: "A portfolio website that visually exposes its own rendering architecture.",
-      tech: ["React", "Three.js", "Zustand"],
+      description:
+        "A portfolio platform designed to reveal the mechanisms behind software systems through interactive architecture visualizations and layered explanations.",
+      tech: ["React", "Vite", "Framer Motion"],
       links: {
         github: "https://github.com/parikar/transparent-machine",
-        website: "https://parikar.com"
+        website: "https://parikar.in"
       }
     },
+
     {
-      id: "rust-kv",
-      title: "Distributed KV Store",
-      description: "A toy distributed Key-Value store implementing a basic Raft consensus algorithm.",
-      tech: ["Rust", "Tokio", "gRPC"],
+      id: "inquest",
+      title: "Inquest",
+      description:
+        "A form builder platform focused on creating, managing, and collecting structured responses through customizable forms.",
+      tech: ["React", "Appwrite", "Tailwind CSS"],
       links: {
-        github: "https://github.com/parikar/rust-kv",
+        github: null,
         website: null
       }
     },
+
     {
-      id: "custom-reconciler",
-      title: "Mini React Reconciler",
-      description: "A scratch-built virtual DOM reconciler to understand fiber tree traversal.",
-      tech: ["JavaScript", "DOM API"],
+      id: "oidc-provider",
+      title: "OIDC Authentication Service",
+      description:
+        "An identity provider implementing OAuth 2.0 and OpenID Connect concepts to better understand authentication, authorization, and token flows.",
+      tech: ["Node.js", "Fastify", "TypeScript"],
       links: {
-        github: "https://github.com/parikar/mini-reconciler",
-        website: "https://demo.parikar.com/reconciler"
+        github: null,
+        website: null
       }
     },
+
     {
-      id: "wasm-physics",
-      title: "WASM Physics Engine",
-      description: "A 2D rigid body physics engine compiled to WebAssembly for browser use.",
-      tech: ["C++", "WebAssembly", "Canvas API"],
+      id: "travelblogs",
+      title: "TravelBlogs",
+      description:
+        "A blogging platform where users can create, manage, and share travel experiences through rich content and media.",
+      tech: ["React", "Appwrite", "Tailwind CSS"],
       links: {
-        github: "https://github.com/parikar/wasm-physics",
-        website: "https://physics.parikar.com"
+        github: null,
+        website: null
       }
     }
   ]
