@@ -92,7 +92,7 @@ export default function HeroSection() {
               href={s.url}
               target="_blank"
               rel="noreferrer"
-              className="port-link"
+              className="port-link glowing"
             >
               <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>REG-{String(i).padStart(2, '0')}</span>
               {s.name}

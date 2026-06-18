@@ -54,7 +54,7 @@ export default function ContactSection() {
               href={s.url}
               target="_blank"
               rel="noreferrer"
-              className="port-link"
+              className="port-link glowing"
             >
               <span style={{ color: 'var(--accent-green)', fontSize: '0.7rem' }}>PORT:{3000 + i}</span>
               {s.name}

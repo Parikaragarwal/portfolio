@@ -272,11 +272,12 @@ p {
 .port-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-tertiary);
-  padding: 0.4rem 0.8rem;
+  padding: 0.7rem 1.4rem;
   border: 1px solid var(--border-faint);
   border-radius: var(--radius-sm);
   transition: all var(--timing-fast) ease;
@@ -285,11 +286,48 @@ p {
   text-decoration: none;
 }
 
+.port-link svg {
+  width: 1.2em !important;
+  height: 1.2em !important;
+}
+
 .port-link:hover {
   color: var(--accent-green);
   border-color: var(--accent-green);
   text-shadow: 0 0 8px var(--accent-green-glow);
   background: var(--bg-elevated);
+}
+
+@keyframes continuous-glow {
+  0% {
+    box-shadow: 0 0 4px var(--accent-green-glow);
+    border-color: var(--accent-green);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--accent-green-glow);
+    border-color: var(--accent-green);
+  }
+  100% {
+    box-shadow: 0 0 4px var(--accent-green-glow);
+    border-color: var(--accent-green);
+  }
+}
+
+.port-link.glowing {
+  animation: continuous-glow 2.5s infinite ease-in-out;
+  background: var(--bg-elevated);
+  border-width: 2px;
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.port-link.glowing:hover {
+  animation-play-state: paused;
+  box-shadow: 0 0 24px var(--accent-green-glow);
+  transform: translateY(-1px);
+  background: var(--accent-green);
+  color: #ffffff;
 }
 
 .port-link.green:hover {
