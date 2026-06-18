@@ -4,6 +4,11 @@ export const PORTFOLIO_DATA = {
     tagline: "Software Engineer & Architect",
     bio: "I build systems and dismantle them to see how they work. I care about the lowest layers of abstraction and how data physically moves across the network."
   },
+  socials: [
+    { name: "GitHub", url: "https://github.com/parikar" },
+    { name: "Twitter", url: "https://twitter.com/parikar" },
+    { name: "LinkedIn", url: "https://linkedin.com/in/parikar" }
+  ],
   questions: [
     "How does distributed consensus hold up under extreme Byzantine faults?",
     "Why did we abstract away the DOM instead of optimizing it directly?",

@@ -1,83 +1,399 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+/* ============================================================
+   TRANSPARENT MACHINE — Design System
+   A hardware-schematic visual language for portfolio
+   ============================================================ */
 
+/* ---- CSS Custom Properties (Design Tokens) ---- */
 :root {
-  /* LIGHT THEME (Soothing Pastel Matcha) */
-  --bg-base: #E8F2EB; 
-  --bg-surface: #D8E6DE; 
-  --text-main: #1A3324; 
-  --text-muted: #537561;
-  --accent-primary: #2EA879; 
-  --border-light: rgba(46, 168, 121, 0.15);
-  
-  --font-heading: 'Outfit', sans-serif;
+  /* Light Mode: Green-tinted engineering paper */
+  --bg-base: #f0f4ec;
+  --bg-surface: #e8ede3;
+  --bg-elevated: #dce3d5;
+  --bg-overlay: rgba(240, 244, 236, 0.92);
+
+  --text-primary: #1a2e1f;
+  --text-secondary: #3d5a45;
+  --text-tertiary: #6b8a73;
+  --text-dim: #9aac9f;
+
+  --accent-cyan: #0e7c6b;
+  --accent-cyan-glow: rgba(14, 124, 107, 0.4);
+  --accent-amber: #b87a1a;
+  --accent-amber-glow: rgba(184, 122, 26, 0.4);
+  --accent-green: #2d8a4e;
+  --accent-green-glow: rgba(45, 138, 78, 0.4);
+  --accent-red: #c0392b;
+
+  --border-strong: #a3b5a7;
+  --border-medium: #c5d4c8;
+  --border-faint: rgba(26, 46, 31, 0.08);
+
+  --trace-color: #a3b5a7;
+  --trace-glow: rgba(14, 124, 107, 0.2);
+  --node-color: #0e7c6b;
+
+  --grid-color: rgba(26, 46, 31, 0.06);
+  --grid-dot: rgba(26, 46, 31, 0.12);
+
+  --shadow-sm: 0 1px 3px rgba(26, 46, 31, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 46, 31, 0.1);
+  --shadow-lg: 0 8px 32px rgba(26, 46, 31, 0.12);
+  --shadow-glow: 0 0 20px var(--accent-cyan-glow);
+
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 50px;
+
+  --timing-fast: 150ms;
+  --timing-standard: 300ms;
+  --timing-narrative: 800ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 [data-theme="dark"] {
-  /* DARK THEME (Muted Pine / Slate) */
-  --bg-base: #0F1A14;
-  --bg-surface: #15241C;
-  --text-main: #E8F2EB;
-  --text-muted: #8FA89C;
-  --accent-primary: #8CD9B1; /* Soft non-stinging mint */
-  --border-light: rgba(140, 217, 177, 0.15);
+  /* Dark Mode: Blueprint / Oscilloscope display */
+  --bg-base: #080c14;
+  --bg-surface: #0e1420;
+  --bg-elevated: #151d2c;
+  --bg-overlay: rgba(8, 12, 20, 0.94);
+
+  --text-primary: #d8e0e8;
+  --text-secondary: #8a9bb0;
+  --text-tertiary: #5a6d82;
+  --text-dim: #3a4a5c;
+
+  --accent-cyan: #2dd4bf;
+  --accent-cyan-glow: rgba(45, 212, 191, 0.35);
+  --accent-amber: #fbbf24;
+  --accent-amber-glow: rgba(251, 191, 36, 0.3);
+  --accent-green: #34d399;
+  --accent-green-glow: rgba(52, 211, 153, 0.3);
+  --accent-red: #ef4444;
+
+  --border-strong: #2a3a4e;
+  --border-medium: #1e2d3e;
+  --border-faint: rgba(45, 212, 191, 0.08);
+
+  --trace-color: #1e2d3e;
+  --trace-glow: rgba(45, 212, 191, 0.15);
+  --node-color: #2dd4bf;
+
+  --grid-color: rgba(45, 212, 191, 0.04);
+  --grid-dot: rgba(45, 212, 191, 0.1);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px var(--accent-cyan-glow);
 }
 
-* {
+/* ---- Reset & Base ---- */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
 body {
-  background: var(--bg-base);
-  color: var(--text-main);
-  font-family: var(--font-heading);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
   min-height: 100vh;
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.5s ease, color 0.5s ease;
   overflow-x: hidden;
+  transition: background-color var(--timing-standard) ease, color var(--timing-standard) ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  margin-bottom: 1rem;
+/* ---- Circuit Grid Background ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, var(--grid-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
 }
+
+/* ---- Typography ---- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); }
 
 a {
-  color: var(--text-main);
+  color: var(--accent-cyan);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--timing-fast) ease, text-shadow var(--timing-fast) ease;
 }
 
 a:hover {
-  color: var(--accent-primary);
+  text-shadow: 0 0 12px var(--accent-cyan-glow);
 }
 
-/* Three.js Canvas Container */
-#webgl-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 100;
+p {
+  color: var(--text-secondary);
+  max-width: 65ch;
 }
 
-/* Minimalist Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
+/* ---- Component: Chip Block (IC Package Container) ---- */
+.chip-block {
+  position: relative;
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  background: var(--bg-surface);
+  transition: border-color var(--timing-standard) ease, box-shadow var(--timing-standard) ease;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.chip-block:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow);
 }
+
+/* Pin connectors on chip blocks */
+.chip-block::before,
+.chip-block::after {
+  content: '';
+  position: absolute;
+  background: var(--border-medium);
+  transition: background var(--timing-standard) ease;
+}
+
+.chip-block:hover::before,
+.chip-block:hover::after {
+  background: var(--accent-cyan);
+}
+
+/* Left pins */
+.chip-block::before {
+  left: -8px;
+  top: 20%;
+  width: 8px;
+  height: 2px;
+  box-shadow:
+    0 12px 0 var(--border-medium),
+    0 24px 0 var(--border-medium);
+}
+
+.chip-block:hover::before {
+  box-shadow:
+    0 12px 0 var(--accent-cyan),
+    0 24px 0 var(--accent-cyan);
+}
+
+/* Right pins */
+.chip-block::after {
+  right: -8px;
+  top: 20%;
+  width: 8px;
+  height: 2px;
+  box-shadow:
+    0 12px 0 var(--border-medium),
+    0 24px 0 var(--border-medium);
+}
+
+.chip-block:hover::after {
+  box-shadow:
+    0 12px 0 var(--accent-cyan),
+    0 24px 0 var(--accent-cyan);
+}
+
+/* ---- Component: Register Label ---- */
+.register-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.register-label.cyan { color: var(--accent-cyan); }
+.register-label.amber { color: var(--accent-amber); }
+.register-label.green { color: var(--accent-green); }
+
+/* ---- Component: Data Tag ---- */
+.data-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  transition: all var(--timing-fast) ease;
+}
+
+.data-tag:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+/* ---- Component: Port Link ---- */
+.port-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-sm);
+  transition: all var(--timing-fast) ease;
+  cursor: pointer;
+  background: none;
+  text-decoration: none;
+}
+
+.port-link:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  text-shadow: 0 0 8px var(--accent-cyan-glow);
+  background: var(--bg-elevated);
+}
+
+.port-link.green:hover {
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  text-shadow: 0 0 8px var(--accent-green-glow);
+}
+
+/* ---- Layout: Section ---- */
+.section {
+  position: relative;
+  padding: 6rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-medium) 20%,
+    var(--border-medium) 80%,
+    transparent
+  );
+  margin: 0 auto;
+  max-width: 1000px;
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--node-color);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-light);
-  border-radius: 2px;
+  background: var(--border-medium);
+  border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+/* ---- Utility ---- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  .section {
+    padding: 3rem 1rem;
+  }
+}
+
+/* ---- Animation Keyframes ---- */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes trace-flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes led-flicker {
+  0% { opacity: 0.2; }
+  10% { opacity: 1; }
+  20% { opacity: 0.3; }
+  30% { opacity: 0.9; }
+  40% { opacity: 0.15; }
+  50% { opacity: 1; }
+  60% { opacity: 0.4; }
+  70% { opacity: 0.85; }
+  80% { opacity: 0.2; }
+  90% { opacity: 1; }
+  100% { opacity: 0.3; }
 }

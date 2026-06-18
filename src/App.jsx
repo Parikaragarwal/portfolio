@@ -1,33 +1,46 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import Home from './pages/Home';
-import About from './pages/About';
-import Projects from './pages/Projects';
+import BootSequence from './components/BootSequence';
 import FloatingNav from './components/FloatingNav';
-import CanvasOverlay from './components/CanvasOverlay';
+import CircuitBackground from './components/CircuitBackground';
+import HeroSection from './sections/HeroSection';
+import AboutSection from './sections/AboutSection';
+import ProjectsSection from './sections/ProjectsSection';
+import ContactSection from './sections/ContactSection';
 import { useStore } from './store';
 
+function SectionDivider() {
+  return <div className="section-divider" />;
+}
+
 function App() {
-  const { hasEnteredVoid, isTransitioning } = useStore();
+  const { bootPhase } = useStore();
 
   return (
-    <BrowserRouter>
-      <CanvasOverlay />
-      
-      {/* Only render actual content if we have entered the void and are not currently hiding it behind a transition */}
-      {hasEnteredVoid && (
-        <div style={{ opacity: isTransitioning ? 0 : 1, transition: 'opacity 0.5s ease', minHeight: '100vh', paddingBottom: '100px' }}>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/projects" element={<Projects />} />
-            </Routes>
-          </AnimatePresence>
+    <>
+      {/* Boot sequence overlay */}
+      <BootSequence />
+
+      {/* Main content - only visible after boot */}
+      {bootPhase === 'complete' && (
+        <>
+          {/* Decorative circuit traces */}
+          <CircuitBackground />
+
+          {/* Page content */}
+          <main style={{ position: 'relative', zIndex: 1 }}>
+            <HeroSection />
+            <SectionDivider />
+            <AboutSection />
+            <SectionDivider />
+            <ProjectsSection />
+            <SectionDivider />
+            <ContactSection />
+          </main>
+
+          {/* Navigation */}
           <FloatingNav />
-        </div>
+        </>
       )}
-    </BrowserRouter>
+    </>
   );
 }
 
