@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { PORTFOLIO_DATA } from '../data/portfolio';
 import CpuTransition from '../components/CpuTransition';
 
@@ -18,21 +18,28 @@ const fadeUp = {
 
 export default function ProjectsSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.4 });
+  const isInView = useInView(ref, { once: true, amount: 0.15 });
   const [cpuDone, setCpuDone] = useState(false);
+  const [cpuTriggered, setCpuTriggered] = useState(false);
+
+  // Memoize so CpuTransition doesn't re-render when parent state changes
+  const handleCpuComplete = useCallback(() => setCpuDone(true), []);
 
   useEffect(() => {
-    if (isInView && !cpuDone && ref.current) {
-      // Snap to the CPU segment predictably
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (isInView && !cpuDone && !cpuTriggered && ref.current) {
+      setCpuTriggered(true);
+      // Snap viewport to the top of the projects section immediately
+      const rect = ref.current.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      window.scrollTo({ top: scrollTop + rect.top, behavior: 'smooth' });
     }
-  }, [isInView, cpuDone]);
+  }, [isInView, cpuDone, cpuTriggered]);
 
   return (
     <section id="projects" className="section" ref={ref}>
       {/* CPU Transition Animation */}
-      {isInView && !cpuDone && (
-        <CpuTransition onComplete={() => setCpuDone(true)} />
+      {cpuTriggered && !cpuDone && (
+        <CpuTransition onComplete={handleCpuComplete} />
       )}
 
       {/* Projects content - appears after CPU animation */}

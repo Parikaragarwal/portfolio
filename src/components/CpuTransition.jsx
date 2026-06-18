@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CpuSVG } from './HardwareDiagrams';
 
@@ -15,6 +15,8 @@ import { CpuSVG } from './HardwareDiagrams';
 
 export default function CpuTransition({ onComplete }) {
   const [stage, setStage] = useState('init'); // 'init', 'fetch', 'decode', 'execute', 'done'
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     const timings = [
@@ -29,28 +31,42 @@ export default function CpuTransition({ onComplete }) {
     );
 
     const completeTimeout = setTimeout(() => {
-      onComplete?.();
+      onCompleteRef.current?.();
     }, 4000);
 
     return () => {
       timeouts.forEach(clearTimeout);
       clearTimeout(completeTimeout);
     };
-  }, [onComplete]);
+  }, []); // empty deps — animation runs exactly once on mount
 
-  // Lock scrolling while the CPU transition is playing
+  // Lock scrolling while the CPU transition is playing — lock immediately, no delay
   useEffect(() => {
-    let lockTimer;
-    if (stage !== 'done') {
-      lockTimer = setTimeout(() => {
-        document.body.style.overflow = 'hidden';
-      }, 500);
-    } else {
+    if (stage === 'done') {
+      // Release all locks
       document.body.style.overflow = '';
+      return;
     }
+
+    // Lock body overflow immediately
+    document.body.style.overflow = 'hidden';
+
+    // Block wheel, touch, and keyboard scroll events
+    const preventScroll = (e) => e.preventDefault();
+    const preventKeys = (e) => {
+      const scrollKeys = ['ArrowDown', 'ArrowUp', 'Space', 'PageDown', 'PageUp', 'Home', 'End'];
+      if (scrollKeys.includes(e.code)) e.preventDefault();
+    };
+
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+    window.addEventListener('keydown', preventKeys, { passive: false });
+
     return () => {
-      clearTimeout(lockTimer);
       document.body.style.overflow = '';
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+      window.removeEventListener('keydown', preventKeys);
     };
   }, [stage]);
 

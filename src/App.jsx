@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import BootSequence from './components/BootSequence';
 import FloatingNav from './components/FloatingNav';
 import CircuitBackground from './components/CircuitBackground';
@@ -12,7 +13,17 @@ function SectionDivider() {
 }
 
 function App() {
-  const { bootPhase } = useStore();
+  const { bootPhase, setThemeFromOS } = useStore();
+
+  // Listen for OS-level theme changes and sync to store
+  useEffect(() => {
+    try {
+      const mql = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = (e) => setThemeFromOS(e.matches ? 'dark' : 'light');
+      mql.addEventListener('change', handler);
+      return () => mql.removeEventListener('change', handler);
+    } catch (e) { /* no-op in unsupported environments */ }
+  }, [setThemeFromOS]);
 
   return (
     <>

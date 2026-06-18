@@ -3,6 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LaptopSVG, ServerSVG, GlowFilter } from './HardwareDiagrams';
 import { useStore } from '../store';
 
+// Hook to detect mobile viewport for responsive layout
+function useIsMobile(breakpoint = 600) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const handler = (e) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 /*
   Boot Sequence Animation
   
@@ -22,6 +38,7 @@ const STAGES = ['idle', 'drawing', 'request', 'processing', 'response', 'illumin
 export default function BootSequence() {
   const { bootPhase, setBootPhase, skipBoot } = useStore();
   const [stage, setStage] = useState(0); // index into STAGES
+  const isMobile = useIsMobile();
 
   const skip = useCallback(() => {
     skipBoot();
@@ -69,10 +86,12 @@ export default function BootSequence() {
 
   const currentStage = STAGES[stage];
 
-  // Wire endpoints (laptop is at ~28%, server at ~72%)
-  const laptopX = 28;
-  const serverX = 72;
-  const wireY = 50;
+  // Layout positions: horizontal on desktop, vertical on mobile
+  const laptopX = isMobile ? 50 : 28;
+  const laptopY = isMobile ? 30 : 50;
+  const serverX = isMobile ? 50 : 72;
+  const serverY = isMobile ? 70 : 50;
+  const wireY = 50; // used for desktop horizontal wire
 
   return (
     <AnimatePresence>
@@ -132,8 +151,10 @@ export default function BootSequence() {
           {/* Connection wire between laptop and server */}
           {stage >= 1 && (
             <motion.line
-              x1={`${laptopX + 5}%`} y1={`${wireY}%`}
-              x2={`${serverX - 3}%`} y2={`${wireY}%`}
+              x1={isMobile ? '50%' : `${laptopX + 5}%`}
+              y1={isMobile ? `${laptopY + 8}%` : `${wireY}%`}
+              x2={isMobile ? '50%' : `${serverX - 3}%`}
+              y2={isMobile ? `${serverY - 8}%` : `${wireY}%`}
               stroke="url(#wire-gradient)"
               strokeWidth="0.3"
               strokeDasharray="1.5 1"
@@ -147,8 +168,8 @@ export default function BootSequence() {
           {stage >= 1 && [0, 1, 2, 3, 4].map(i => (
             <motion.circle
               key={`dot-${i}`}
-              cx={`${laptopX + 7 + i * 8}%`}
-              cy={`${wireY}%`}
+              cx={isMobile ? '50%' : `${laptopX + 7 + i * 8}%`}
+              cy={isMobile ? `${laptopY + 10 + i * 6}%` : `${wireY}%`}
               r="0.25"
               fill="var(--border-medium)"
               initial={{ opacity: 0 }}
@@ -163,10 +184,17 @@ export default function BootSequence() {
               r="0.8"
               fill="var(--accent-cyan)"
               filter="url(#orb-glow)"
-              cy={`${wireY}%`}
-              initial={{ cx: `${laptopX + 5}%`, opacity: 0, r: 0.4 }}
-              animate={{ cx: `${serverX - 3}%`, opacity: [0, 1, 1, 0.8], r: [0.4, 0.9, 0.8, 0.6] }}
-              transition={{ duration: 1.0, ease: 'easeInOut' }}
+              cx={isMobile ? '50%' : undefined}
+              cy={isMobile ? undefined : `${wireY}%`}
+              initial={isMobile
+                ? { cy: `${laptopY + 8}%`, opacity: 0, r: 0.4 }
+                : { cx: `${laptopX + 5}%`, opacity: 0, r: 0.4 }
+              }
+              animate={isMobile
+                ? { cy: `${serverY - 8}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
+                : { cx: `${serverX - 3}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
+              }
+              transition={{ duration: 1.1, ease: 'easeInOut' }}
             />
           )}
 
@@ -176,31 +204,38 @@ export default function BootSequence() {
               r="0.8"
               fill="var(--accent-amber)"
               filter="url(#orb-glow)"
-              cy={`${wireY}%`}
-              initial={{ cx: `${serverX - 3}%`, opacity: 0, r: 0.4 }}
-              animate={{ cx: `${laptopX + 5}%`, opacity: [0, 1, 1, 0.8], r: [0.4, 0.9, 0.8, 0.6] }}
-              transition={{ duration: 0.8, ease: 'easeInOut' }}
+              cx={isMobile ? '50%' : undefined}
+              cy={isMobile ? undefined : `${wireY}%`}
+              initial={isMobile
+                ? { cy: `${serverY - 8}%`, opacity: 0, r: 0.4 }
+                : { cx: `${serverX - 3}%`, opacity: 0, r: 0.4 }
+              }
+              animate={isMobile
+                ? { cy: `${laptopY + 8}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
+                : { cx: `${laptopX + 5}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
+              }
+              transition={{ duration: 0.9, ease: 'easeInOut' }}
             />
           )}
         </svg>
 
-        {/* Laptop - positioned at left-center */}
+        {/* Laptop - positioned at left-center (desktop) or top-center (mobile) */}
         {stage >= 1 && (
           <motion.div
             style={{
               position: 'absolute',
               left: `${laptopX}%`,
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              top: `${laptopY}%`,
+              transform: `translate(-50%, -50%)${isMobile ? ' scale(0.75)' : ''}`,
               transformOrigin: 'center center',
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: isMobile ? 0.6 : 0.8 }}
             animate={
               currentStage === 'reveal'
                 ? { scale: 15, opacity: 0 }
                 : currentStage === 'illuminate'
-                ? { scale: 1.05, opacity: 1 }
-                : { scale: 1, opacity: 1 }
+                ? { scale: isMobile ? 0.8 : 1.05, opacity: 1 }
+                : { scale: isMobile ? 0.75 : 1, opacity: 1 }
             }
             transition={
               currentStage === 'reveal'
@@ -212,25 +247,25 @@ export default function BootSequence() {
           </motion.div>
         )}
 
-        {/* Server - positioned at right-center */}
+        {/* Server - positioned at right-center (desktop) or bottom-center (mobile) */}
         {stage >= 1 && (
           <motion.div
             style={{
               position: 'absolute',
               left: `${serverX}%`,
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              top: `${serverY}%`,
+              transform: `translate(-50%, -50%)${isMobile ? ' scale(0.65)' : ''}`,
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: isMobile ? 0.5 : 0.8 }}
             animate={
               currentStage === 'reveal' || currentStage === 'illuminate'
-                ? { opacity: 0, x: 50 }
+                ? { opacity: 0, x: isMobile ? 0 : 50, y: isMobile ? 50 : 0 }
                 : currentStage === 'processing'
                 ? {
                     opacity: 1,
                     x: [0, -2, 2, -1, 1, 0], // vibration
                   }
-                : { opacity: 1, scale: 1 }
+                : { opacity: 1, scale: isMobile ? 0.65 : 1 }
             }
             transition={
               currentStage === 'processing'
