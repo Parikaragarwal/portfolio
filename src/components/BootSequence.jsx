@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LaptopSVG, ServerSVG, GlowFilter } from './HardwareDiagrams';
+import { LaptopSVG, ServerSVG } from './HardwareDiagrams';
 import { useStore } from '../store';
 
 // Hook to detect mobile viewport for responsive layout
@@ -34,6 +34,12 @@ function useIsMobile(breakpoint = 600) {
 */
 
 const STAGES = ['idle', 'drawing', 'request', 'processing', 'response', 'illuminate', 'reveal', 'complete'];
+
+// Desktop layout: SVG viewBox is 0 0 100 100 with preserveAspectRatio=none
+// so SVG unit coordinates map 1:1 to percentage of viewport
+const LAPTOP_SVG_X = 28;  // matches CSS left: 28%
+const SERVER_SVG_X = 72;  // matches CSS left: 72%
+const WIRE_SVG_Y  = 50;   // matches CSS top: 50%
 
 export default function BootSequence() {
   const { bootPhase, setBootPhase, skipBoot } = useStore();
@@ -86,13 +92,6 @@ export default function BootSequence() {
 
   const currentStage = STAGES[stage];
 
-  // Layout positions: horizontal on desktop, vertical on mobile
-  const laptopX = isMobile ? 50 : 28;
-  const laptopY = isMobile ? 30 : 50;
-  const serverX = isMobile ? 50 : 72;
-  const serverY = isMobile ? 70 : 50;
-  const wireY = 50; // used for desktop horizontal wire
-
   return (
     <AnimatePresence>
       <motion.div
@@ -104,12 +103,10 @@ export default function BootSequence() {
         style={{
           position: 'fixed',
           inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           background: 'var(--bg-base)',
           zIndex: 9999,
           cursor: 'pointer',
+          overflow: 'hidden',
         }}
         onClick={skip}
       >
@@ -122,166 +119,19 @@ export default function BootSequence() {
           opacity: 0.4,
         }} />
 
-        {/* Main SVG canvas for the animation */}
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ position: 'absolute', inset: 0 }}
-        >
-          <defs>
-            <filter id="orb-glow" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="1.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* Gradient for the connection wire */}
-            <linearGradient id="wire-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="var(--border-medium)" stopOpacity="0.3" />
-              <stop offset="50%" stopColor="var(--border-medium)" stopOpacity="1" />
-              <stop offset="100%" stopColor="var(--border-medium)" stopOpacity="0.3" />
-            </linearGradient>
-          </defs>
-
-          {/* Connection wire between laptop and server */}
-          {stage >= 1 && (
-            <motion.line
-              x1={isMobile ? '50%' : `${laptopX + 5}%`}
-              y1={isMobile ? `${laptopY + 8}%` : `${wireY}%`}
-              x2={isMobile ? '50%' : `${serverX - 3}%`}
-              y2={isMobile ? `${serverY - 8}%` : `${wireY}%`}
-              stroke="url(#wire-gradient)"
-              strokeWidth="0.3"
-              strokeDasharray="1.5 1"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            />
-          )}
-
-          {/* Data flow dots along wire */}
-          {stage >= 1 && [0, 1, 2, 3, 4].map(i => (
-            <motion.circle
-              key={`dot-${i}`}
-              cx={isMobile ? '50%' : `${laptopX + 7 + i * 8}%`}
-              cy={isMobile ? `${laptopY + 10 + i * 6}%` : `${wireY}%`}
-              r="0.25"
-              fill="var(--border-medium)"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              transition={{ delay: 0.5 + i * 0.1 }}
-            />
-          ))}
-
-          {/* Request orb: laptop → server */}
-          {(currentStage === 'request') && (
-            <motion.circle
-              r="0.8"
-              fill="var(--accent-cyan)"
-              filter="url(#orb-glow)"
-              cx={isMobile ? '50%' : undefined}
-              cy={isMobile ? undefined : `${wireY}%`}
-              initial={isMobile
-                ? { cy: `${laptopY + 8}%`, opacity: 0, r: 0.4 }
-                : { cx: `${laptopX + 5}%`, opacity: 0, r: 0.4 }
-              }
-              animate={isMobile
-                ? { cy: `${serverY - 8}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
-                : { cx: `${serverX - 3}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
-              }
-              transition={{ duration: 1.1, ease: 'easeInOut' }}
-            />
-          )}
-
-          {/* Response orb: server → laptop */}
-          {(currentStage === 'response') && (
-            <motion.circle
-              r="0.8"
-              fill="var(--accent-amber)"
-              filter="url(#orb-glow)"
-              cx={isMobile ? '50%' : undefined}
-              cy={isMobile ? undefined : `${wireY}%`}
-              initial={isMobile
-                ? { cy: `${serverY - 8}%`, opacity: 0, r: 0.4 }
-                : { cx: `${serverX - 3}%`, opacity: 0, r: 0.4 }
-              }
-              animate={isMobile
-                ? { cy: `${laptopY + 8}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
-                : { cx: `${laptopX + 5}%`, opacity: [0, 1, 1, 1], r: [0.4, 0.9, 0.8, 0.7] }
-              }
-              transition={{ duration: 0.9, ease: 'easeInOut' }}
-            />
-          )}
-        </svg>
-
-        {/* Laptop - positioned at left-center (desktop) or top-center (mobile) */}
-        {stage >= 1 && (
-          <motion.div
-            style={{
-              position: 'absolute',
-              left: `${laptopX}%`,
-              top: `${laptopY}%`,
-              transform: `translate(-50%, -50%)${isMobile ? ' scale(0.75)' : ''}`,
-              transformOrigin: 'center center',
-            }}
-            initial={{ opacity: 0, scale: isMobile ? 0.6 : 0.8 }}
-            animate={
-              currentStage === 'reveal'
-                ? { scale: 15, opacity: 0 }
-                : currentStage === 'illuminate'
-                ? { scale: isMobile ? 0.8 : 1.05, opacity: 1 }
-                : { scale: isMobile ? 0.75 : 1, opacity: 1 }
-            }
-            transition={
-              currentStage === 'reveal'
-                ? { duration: 0.8, ease: [0.4, 0, 0.2, 1] }
-                : { duration: 0.5, ease: 'easeOut' }
-            }
-          >
-            <LaptopSVG screenLit={currentStage === 'illuminate' || currentStage === 'reveal'} />
-          </motion.div>
-        )}
-
-        {/* Server - positioned at right-center (desktop) or bottom-center (mobile) */}
-        {stage >= 1 && (
-          <motion.div
-            style={{
-              position: 'absolute',
-              left: `${serverX}%`,
-              top: `${serverY}%`,
-              transform: `translate(-50%, -50%)${isMobile ? ' scale(0.65)' : ''}`,
-            }}
-            initial={{ opacity: 0, scale: isMobile ? 0.5 : 0.8 }}
-            animate={
-              currentStage === 'reveal' || currentStage === 'illuminate'
-                ? { opacity: 0, x: isMobile ? 0 : 50, y: isMobile ? 50 : 0 }
-                : currentStage === 'processing'
-                ? {
-                    opacity: 1,
-                    x: [0, -2, 2, -1, 1, 0], // vibration
-                  }
-                : { opacity: 1, scale: isMobile ? 0.65 : 1 }
-            }
-            transition={
-              currentStage === 'processing'
-                ? { x: { duration: 0.3, repeat: Infinity } }
-                : { duration: 0.5 }
-            }
-          >
-            <ServerSVG isProcessing={currentStage === 'processing'} />
-          </motion.div>
+        {isMobile ? (
+          /* ── MOBILE LAYOUT: clean flexbox column ── */
+          <MobileBootLayout currentStage={currentStage} stage={stage} />
+        ) : (
+          /* ── DESKTOP LAYOUT: SVG-positioned ── */
+          <DesktopBootLayout currentStage={currentStage} stage={stage} />
         )}
 
         {/* Stage label */}
         <motion.div
           style={{
             position: 'absolute',
-            bottom: '18%',
+            bottom: isMobile ? '12%' : '18%',
             left: '50%',
             transform: 'translateX(-50%)',
             fontFamily: 'var(--font-mono)',
@@ -289,16 +139,17 @@ export default function BootSequence() {
             color: 'var(--text-dim)',
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
           }}
           animate={{ opacity: [0.3, 0.8, 0.3] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          {currentStage === 'drawing' && '> initializing hardware...'}
-          {currentStage === 'request' && '> sending SYN packet...'}
+          {currentStage === 'drawing'    && '> initializing hardware...'}
+          {currentStage === 'request'    && '> sending SYN packet...'}
           {currentStage === 'processing' && '> server processing request...'}
-          {currentStage === 'response' && '> receiving ACK + data...'}
+          {currentStage === 'response'   && '> receiving ACK + data...'}
           {currentStage === 'illuminate' && '> rendering viewport...'}
-          {currentStage === 'reveal' && '> mounting DOM...'}
+          {currentStage === 'reveal'     && '> mounting DOM...'}
         </motion.div>
 
         {/* Skip hint */}
@@ -321,5 +172,279 @@ export default function BootSequence() {
         </motion.div>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+/* ────────────────────────────────────────────────
+   DESKTOP LAYOUT — SVG canvas positions everything
+   SVG viewBox 0 0 100 100 + preserveAspectRatio=none
+   means unit coords map 1:1 to viewport percentages
+──────────────────────────────────────────────── */
+function DesktopBootLayout({ currentStage, stage }) {
+  return (
+    <>
+      {/* SVG canvas for wire and orbs */}
+      <svg
+        width="100%" height="100%"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        style={{ position: 'absolute', inset: 0 }}
+      >
+        <defs>
+          <filter id="orb-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="wire-gradient" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stopColor="var(--border-medium)" stopOpacity="0.3" />
+            <stop offset="50%"  stopColor="var(--border-medium)" stopOpacity="1" />
+            <stop offset="100%" stopColor="var(--border-medium)" stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
+
+        {/* Connection wire */}
+        {stage >= 1 && (
+          <motion.line
+            x1={LAPTOP_SVG_X + 5} y1={WIRE_SVG_Y}
+            x2={SERVER_SVG_X - 3} y2={WIRE_SVG_Y}
+            stroke="var(--border-medium)"
+            strokeWidth="0.3"
+            strokeDasharray="1.5 1"
+            strokeOpacity="0.7"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
+
+        {/* Static dots along wire */}
+        {stage >= 1 && [0, 1, 2, 3, 4].map(i => (
+          <motion.circle
+            key={`dot-${i}`}
+            cx={LAPTOP_SVG_X + 8 + i * 7}
+            cy={WIRE_SVG_Y}
+            r={0.25}
+            fill="var(--border-medium)"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            transition={{ delay: 0.5 + i * 0.1 }}
+          />
+        ))}
+
+        {/* Request orb: laptop → server (pure numeric cx animation) */}
+        {currentStage === 'request' && (
+          <motion.circle
+            cy={WIRE_SVG_Y}
+            r={0.9}
+            fill="var(--accent-cyan)"
+            filter="url(#orb-glow)"
+            initial={{ cx: LAPTOP_SVG_X + 5, opacity: 0 }}
+            animate={{ cx: SERVER_SVG_X - 3, opacity: [0, 1, 1, 1] }}
+            transition={{ duration: 1.1, ease: 'easeInOut' }}
+          />
+        )}
+
+        {/* Response orb: server → laptop (pure numeric cx animation) */}
+        {currentStage === 'response' && (
+          <motion.circle
+            cy={WIRE_SVG_Y}
+            r={0.9}
+            fill="var(--accent-amber)"
+            filter="url(#orb-glow)"
+            initial={{ cx: SERVER_SVG_X - 3, opacity: 0 }}
+            animate={{ cx: LAPTOP_SVG_X + 5, opacity: [0, 1, 1, 1] }}
+            transition={{ duration: 0.9, ease: 'easeInOut' }}
+          />
+        )}
+      </svg>
+
+      {/* Laptop div — CSS positioned to match SVG coord */}
+      {stage >= 1 && (
+        <motion.div
+          style={{
+            position: 'absolute',
+            left: `${LAPTOP_SVG_X}%`,
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            transformOrigin: 'center center',
+          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={
+            currentStage === 'reveal'
+              ? { scale: 15, opacity: 0 }
+              : currentStage === 'illuminate'
+              ? { scale: 1.05, opacity: 1 }
+              : { scale: 1, opacity: 1 }
+          }
+          transition={
+            currentStage === 'reveal'
+              ? { duration: 0.8, ease: [0.4, 0, 0.2, 1] }
+              : { duration: 0.5, ease: 'easeOut' }
+          }
+        >
+          <LaptopSVG screenLit={currentStage === 'illuminate' || currentStage === 'reveal'} />
+        </motion.div>
+      )}
+
+      {/* Server div */}
+      {stage >= 1 && (
+        <motion.div
+          style={{
+            position: 'absolute',
+            left: `${SERVER_SVG_X}%`,
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={
+            currentStage === 'reveal' || currentStage === 'illuminate'
+              ? { opacity: 0, x: 60 }
+              : currentStage === 'processing'
+              ? { opacity: 1, x: [0, -2, 2, -1, 1, 0] }
+              : { opacity: 1, scale: 1 }
+          }
+          transition={
+            currentStage === 'processing'
+              ? { x: { duration: 0.3, repeat: Infinity } }
+              : { duration: 0.5 }
+          }
+        >
+          <ServerSVG isProcessing={currentStage === 'processing'} />
+        </motion.div>
+      )}
+    </>
+  );
+}
+
+/* ────────────────────────────────────────────────
+   MOBILE LAYOUT — flexbox column, no SVG positioning
+   Clean stacked layout: laptop on top, server below,
+   HTML orb animates between them
+──────────────────────────────────────────────── */
+function MobileBootLayout({ currentStage, stage }) {
+  if (stage < 1) return null;
+
+  const isRevealing = currentStage === 'reveal' || currentStage === 'illuminate';
+
+  return (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '1.5rem',
+    }}>
+      {/* Laptop */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={
+          currentStage === 'reveal'
+            ? { scale: 12, opacity: 0 }
+            : currentStage === 'illuminate'
+            ? { scale: 1.05, opacity: 1, y: 0 }
+            : { scale: 1, opacity: 1, y: 0 }
+        }
+        transition={
+          currentStage === 'reveal'
+            ? { duration: 0.8, ease: [0.4, 0, 0.2, 1] }
+            : { duration: 0.5 }
+        }
+        style={{ transformOrigin: 'center center' }}
+      >
+        <LaptopSVG
+          screenLit={currentStage === 'illuminate' || currentStage === 'reveal'}
+          style={{ width: 160, height: 'auto' }}
+        />
+      </motion.div>
+
+      {/* Wire + orb column */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        position: 'relative',
+        width: 2,
+        height: 60,
+      }}>
+        {/* Dashed wire */}
+        <svg width="2" height="60" style={{ overflow: 'visible', opacity: isRevealing ? 0 : 1 }}>
+          <motion.line
+            x1="1" y1="0" x2="1" y2="60"
+            stroke="var(--border-medium)"
+            strokeWidth="1.5"
+            strokeDasharray="4 3"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        </svg>
+
+        {/* Request orb — travels DOWN (laptop→server) */}
+        {currentStage === 'request' && (
+          <motion.div style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'var(--accent-cyan)',
+            boxShadow: '0 0 12px var(--accent-cyan), 0 0 24px var(--accent-cyan)',
+          }}
+            initial={{ y: 0, opacity: 0 }}
+            animate={{ y: 60, opacity: [0, 1, 1, 0.8] }}
+            transition={{ duration: 1.0, ease: 'easeInOut' }}
+          />
+        )}
+
+        {/* Response orb — travels UP (server→laptop) */}
+        {currentStage === 'response' && (
+          <motion.div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'var(--accent-amber)',
+            boxShadow: '0 0 12px var(--accent-amber), 0 0 24px var(--accent-amber)',
+          }}
+            initial={{ y: 0, opacity: 0 }}
+            animate={{ y: -60, opacity: [0, 1, 1, 0.8] }}
+            transition={{ duration: 0.9, ease: 'easeInOut' }}
+          />
+        )}
+      </div>
+
+      {/* Server */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={
+          isRevealing
+            ? { opacity: 0, y: 40 }
+            : currentStage === 'processing'
+            ? { opacity: 1, y: 0, x: [0, -2, 2, -1, 1, 0] }
+            : { opacity: 1, y: 0 }
+        }
+        transition={
+          currentStage === 'processing'
+            ? { x: { duration: 0.3, repeat: Infinity } }
+            : { duration: 0.5 }
+        }
+      >
+        <ServerSVG
+          isProcessing={currentStage === 'processing'}
+          style={{ width: 90, height: 'auto' }}
+        />
+      </motion.div>
+    </div>
   );
 }

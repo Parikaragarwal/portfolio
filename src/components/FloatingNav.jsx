@@ -2,17 +2,34 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store';
 
+// Hook to detect mobile viewport
+function useIsMobile(breakpoint = 600) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const handler = (e) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 const SECTIONS = [
-  { id: 'hero', label: 'MIND' },
-  { id: 'about', label: 'SYSTEMS' },
-  { id: 'projects', label: 'MACHINE' },
-  { id: 'contact', label: 'CONNECT' },
+  { id: 'hero', label: 'MIND', mobileLabel: 'MIND' },
+  { id: 'about', label: 'SYSTEMS', mobileLabel: 'SYS' },
+  { id: 'projects', label: 'MACHINE', mobileLabel: 'MCH' },
+  { id: 'contact', label: 'CONNECT', mobileLabel: 'CONN' },
 ];
 
 export default function FloatingNav() {
   const { theme, toggleTheme, bootPhase, activeSection, setActiveSection, replayBoot } = useStore();
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const isMobile = useIsMobile();
 
   // Hide on scroll down, show on scroll up
   useEffect(() => {
@@ -72,13 +89,14 @@ export default function FloatingNav() {
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         style={{
           position: 'fixed',
-          bottom: '1.5rem',
+          bottom: isMobile ? '0.75rem' : '1.5rem',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.25rem',
-          padding: '0.5rem 0.75rem',
+          gap: isMobile ? '0.1rem' : '0.25rem',
+          padding: isMobile ? '0.35rem 0.5rem' : '0.5rem 0.75rem',
+          maxWidth: 'calc(100vw - 1.5rem)',
           background: 'var(--bg-overlay)',
           border: '1px solid var(--border-faint)',
           borderRadius: 'var(--radius-pill)',
@@ -91,7 +109,8 @@ export default function FloatingNav() {
         role="navigation"
         aria-label="Main navigation"
       >
-        {SECTIONS.map(({ id, label }) => (
+        {/* Section nav buttons - desktop only */}
+        {!isMobile && SECTIONS.map(({ id, label }) => (
           <button
             key={id}
             id={`nav-${id}`}
@@ -109,6 +128,7 @@ export default function FloatingNav() {
               letterSpacing: '0.08em',
               transition: 'color 0.2s ease',
               borderRadius: 'var(--radius-pill)',
+              whiteSpace: 'nowrap',
             }}
           >
             {activeSection === id && (
@@ -129,14 +149,16 @@ export default function FloatingNav() {
           </button>
         ))}
 
-        {/* Divider */}
-        <div style={{
-          width: '1px',
-          height: '16px',
-          background: 'var(--border-medium)',
-          margin: '0 0.25rem',
-          flexShrink: 0,
-        }} />
+        {/* Divider - desktop only */}
+        {!isMobile && (
+          <div style={{
+            width: '1px',
+            height: '16px',
+            background: 'var(--border-medium)',
+            margin: '0 0.25rem',
+            flexShrink: 0,
+          }} />
+        )}
 
         {/* Replay Boot Toggle */}
         <button
