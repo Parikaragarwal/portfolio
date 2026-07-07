@@ -2,7 +2,7 @@ export const PORTFOLIO_DATA = {
   about: {
     name: "Parikar Agarwal",
     tagline: "Full Stack Developer & Systems Explorer",
-    bio: "I enjoy building web applications and then digging beneath the abstractions that make them work. From OAuth flows and type-safe APIs to Linux, networking, deployment, and system architecture, I'm fascinated by how software moves through the stack.",
+    bio: "I'm driven by understanding how software works beneath the abstractions. I enjoy building reliable backend systems, exploring distributed architecture, authentication, networking, Linux, and the infrastructure that powers modern applications. My goal is to engineer systems that are both practical and deeply understood.",
   },
 
   socials: [
@@ -11,36 +11,39 @@ export const PORTFOLIO_DATA = {
   ],
 
   questions: [
-    "Where does complexity actually come from in software systems?",
-    "How far can type safety be pushed across the frontend-backend boundary?",
-    "What abstractions are worth keeping, and which ones hide too much?",
-    "How does a request really travel from a browser to a database and back?",
+    "What actually happens after I click 'Deploy'?",
+    "How do large-scale systems stay reliable under failure?",
+    "Which abstractions improve engineering, and which prevent understanding?",
+    "How does data travel from a browser to server and back at every layer?",
   ],
 
   obsessions: [
+    "Distributed Systems",
+    "System Design",
+    "Automation",
+    "Real-Time Systems",
     "OAuth & Identity",
     "Type-Safe APIs",
     "Linux",
     "Networking",
-    "System Architecture",
-    "Developer Tooling",
-    "Self Hosting",
+    "Developer Infrastructure",
+    "Data Structures & Algorithms",
   ],
 
   admiredSystems: [
-    "Git — A distributed system most developers use every day without fully appreciating its design.",
-    "PostgreSQL — A database that keeps revealing deeper layers the more you study it.",
-    "Linux — The foundation beneath most modern software infrastructure.",
-    "TypeScript — A practical example of how tooling can dramatically improve developer experience.",
+    "Git — A beautifully designed distributed version control system hiding remarkable engineering beneath a simple interface.",
+    "Computer Architecture — A field that explores how software interacts with hardware and how computers work under the hood.",
+    "Linux — The operating system powering most of the modern internet.",
+    "TypeScript — Proof that great tooling can fundamentally improve software engineering.",
   ],
 
   projects: [
     {
-      id: "transparent-machine",
+      id: "internals",
       title: "Internals",
       description:
-        "A portfolio platform designed to reveal the mechanisms behind software systems through interactive architecture visualizations and layered explanations.",
-      tech: ["React", "Vite", "Framer Motion"],
+        "An interactive portfolio that explains how modern software systems work through layered visualizations, animations, and architectural deep dives.",
+      tech: ["React", "Vite", "Framer Motion", "TypeScript"],
       links: {
         github: "https://github.com/Parikaragarwal/portfolio",
         website: "https://parikar.in",
@@ -51,35 +54,35 @@ export const PORTFOLIO_DATA = {
       id: "inquest",
       title: "Inquest",
       description:
-        "A form builder platform focused on creating, managing, and collecting structured responses through customizable forms.",
-      tech: ["React", "Appwrite", "Tailwind CSS"],
+        "A modern form platform for creating, managing, and analyzing customizable forms with a type-safe full-stack architecture.",
+      tech: ["React", "tRPC", "Redis", "TypeScript"],
       links: {
-        github: null,
-        website: null,
+        github: "https://github.com/Parikaragarwal/Inquest",
+        website: "https://inquest.parikar.in",
       },
     },
 
     {
-      id: "oidc-provider",
-      title: "OIDC Authentication Service",
+      id: "shomei-auth",
+      title: "Shomei Auth",
       description:
-        "An identity provider implementing OAuth 2.0 and OpenID Connect concepts to better understand authentication, authorization, and token flows.",
-      tech: ["Node.js", "Postgres", "TypeScript"],
+        "An OAuth 2.0 and OpenID Connect identity provider built to understand authentication, authorization, token lifecycles, and secure identity flows from first principles.",
+      tech: ["Node.js", "PostgreSQL", "TypeScript"],
       links: {
-        github: null,
-        website: null,
+        github: "https://github.com/Parikaragarwal/Shomei-auth",
+        website: "https://auth.parikar.in",
       },
     },
 
     {
-      id: "travelblogs",
-      title: "TravelBlogs",
+      id: "cell-city",
+      title: "Cell City Telecom",
       description:
-        "A blogging platform where users can create, manage, and share travel experiences through rich content and media.",
+        "A production website built for a local mobile retailer, focused on delivering a responsive user experience and a reliable online presence for the business.",
       tech: ["React", "Appwrite", "Tailwind CSS"],
       links: {
-        github: null,
-        website: null,
+        github: "https://github.com/Parikaragarwal/Cell-City",
+        website: "https://www.cellcitytelecom.com/",
       },
     },
   ],
